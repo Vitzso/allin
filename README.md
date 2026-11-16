@@ -10,12 +10,21 @@ I wanted one quiet page that shows what I need to do today, how my week of train
 It is a small web app you run yourself. You open it in your browser, your data sits in an encrypted vault on your own machine, and it doesn't talk to the internet unless you switch on a price feed.
 
 <p align="center">
-  <img src="docs/images/markets.png" width="32%" alt="The Markets view: a price chart beside a five-symbol watchlist">
-  <img src="docs/images/tasks.png" width="32%" alt="The Tasks view: a list of tasks with projects and estimates">
-  <img src="docs/images/health.png" width="32%" alt="The Health view: weekly workouts and weight">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/markets-dark.png">
+    <img src="docs/images/markets.png" width="40%" alt="The Markets view: a price chart beside a five-symbol watchlist">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/tasks-dark.png">
+    <img src="docs/images/tasks.png" width="40%" alt="The Tasks view: a list of tasks with projects and estimates">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/phone-dark.png">
+    <img src="docs/images/phone.png" width="17%" alt="AllIn on a phone, with the five sections in a tab bar at the bottom">
+  </picture>
 </p>
 
-<p align="center"><sub>Every screenshot shows the built-in preview. All of the data in them is made up.</sub></p>
+<p align="center"><sub>Every screenshot shows the built-in preview, and all of the data in them is made up.<br>AllIn follows your device's light or dark setting, and so do these pictures.</sub></p>
 
 ## What's in it
 

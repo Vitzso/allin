@@ -24,18 +24,39 @@ try {
   }
   mkdirSync(images, { recursive: true });
   const browser = await chromium.launch();
-  const page = await browser.newPage({
-    viewport: { width: 1280, height: 820 },
-    reducedMotion: 'reduce',
-  });
-  await page.goto(base);
-  const nav = page.getByRole('navigation', { name: 'Main navigation' });
-  await nav.waitFor();
-  for (const view of ['Today', 'Markets', 'Tasks', 'Health']) {
-    await nav.getByRole('button', { name: new RegExp(`^${view}`) }).click();
-    await page.waitForTimeout(600);
-    await page.screenshot({ path: join(images, `${view.toLowerCase()}.png`) });
-    console.log(`docs/images/${view.toLowerCase()}.png`);
+  // Each view in light and in dark, so the README can match the visitor's own setting.
+  for (const scheme of ['light', 'dark'] as const) {
+    const suffix = scheme === 'dark' ? '-dark' : '';
+    const page = await browser.newPage({
+      viewport: { width: 1280, height: 820 },
+      reducedMotion: 'reduce',
+      colorScheme: scheme,
+    });
+    await page.goto(base);
+    const nav = page.getByRole('navigation', { name: 'Main navigation' });
+    await nav.waitFor();
+    for (const view of ['Today', 'Markets', 'Tasks', 'Health']) {
+      await nav.getByRole('button', { name: new RegExp(`^${view}`) }).click();
+      await page.waitForTimeout(600);
+      await page.screenshot({ path: join(images, `${view.toLowerCase()}${suffix}.png`) });
+      console.log(`docs/images/${view.toLowerCase()}${suffix}.png`);
+    }
+    await page.close();
+    // The same Today view on a phone, with the tab bar.
+    const phone = await browser.newPage({
+      viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+      reducedMotion: 'reduce',
+      colorScheme: scheme,
+    });
+    await phone.goto(base);
+    await phone.getByRole('navigation', { name: 'Sections' }).waitFor();
+    await phone.waitForTimeout(600);
+    await phone.screenshot({ path: join(images, `phone${suffix}.png`) });
+    console.log(`docs/images/phone${suffix}.png`);
+    await phone.close();
   }
   // The banner at the top of the README, in the two colour schemes GitHub can show.
   const banner = await browser.newPage({

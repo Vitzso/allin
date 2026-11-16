@@ -126,9 +126,12 @@
         <li>Offline by default</li>
       </ul>
     </div>
-    <div class="shot"><img src="../docs/images/today.png" alt="" /></div>
+    <div class="shot"><img id="shot" src="../docs/images/today.png" alt="" /></div>
     <script>
-      if (location.search.includes('dark')) document.body.classList.add('dark');
+      if (location.search.includes('dark')) {
+        document.body.classList.add('dark');
+        document.getElementById('shot').src = '../docs/images/today-dark.png';
+      }
     </script>
   </body>
 </html>

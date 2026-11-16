@@ -405,6 +405,8 @@ export function createApp(
         '.css': 'text/css; charset=utf-8',
         '.svg': 'image/svg+xml',
         '.woff2': 'font/woff2',
+        '.png': 'image/png',
+        '.webmanifest': 'application/manifest+json',
       };
       let bytes: Buffer;
       try {

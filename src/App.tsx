@@ -501,6 +501,21 @@ export default function App() {
           </div>
         </div>
       </aside>
+      {/* Phones get the five sections as a tab bar in thumb reach. Hidden on wider screens. */}
+      <nav className="tabbar" aria-label="Sections">
+        {nav.map((item) => (
+          <button
+            key={item.name}
+            className={page === item.name ? 'active' : ''}
+            onClick={() => go(item.name)}
+            aria-current={page === item.name ? 'page' : undefined}
+            aria-label={item.name}
+          >
+            <item.icon size={22} />
+            <span>{item.name === 'Weekly review' ? 'Review' : item.name}</span>
+          </button>
+        ))}
+      </nav>
       <div className="main-shell">
         <header className="topbar">
           <div className="breadcrumb">
