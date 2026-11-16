@@ -1,0 +1,21 @@
+# Fixed, so the volumes keep their names (allin_allin-vault, allin_allin-keys) when the
+# release folder name changes with the version.
+name: allin
+services:
+  allin:
+    build: .
+    image: allin-local
+    restart: unless-stopped
+    network_mode: host
+    env_file: docker.env
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    tmpfs: ['/tmp']
+    volumes:
+      - allin-vault:/data/vault
+      - allin-keys:/data/keys
+      - ./tls:/etc/allin/tls:ro
+volumes:
+  allin-vault:
+  allin-keys:

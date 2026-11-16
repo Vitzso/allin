@@ -1,0 +1,7 @@
+# Packaged as .dockerignore. The image copies only the four entries below, so nothing else in
+# the release folder is sent to the Docker daemon: not tls/ with the key, not docker.env.
+*
+!package.json
+!package-lock.json
+!build
+!dist

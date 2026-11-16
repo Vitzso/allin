@@ -1,0 +1,21 @@
+[Unit]
+Description=AllIn
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=allin
+Group=allin
+EnvironmentFile=/etc/allin/allin.env
+WorkingDirectory=/opt/allin
+ExecStart=/usr/bin/env node /opt/allin/build/server/index.js
+Restart=on-failure
+RestartSec=5
+UMask=0077
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ReadWritePaths=/var/lib/allin
+
+[Install]
+WantedBy=multi-user.target

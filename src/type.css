@@ -1,0 +1,7 @@
+/* System fonts stay on-device: no remote font requests. */
+@font-face {
+  font-family: 'AllIn Sans';
+  src: local('Inter'), local('SF Pro Text'), local('Helvetica Neue');
+  font-weight: 100 900;
+  font-display: swap;
+}

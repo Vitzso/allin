@@ -1,0 +1,7 @@
+AllIn
+Copyright 2026 Vitzso
+
+Licensed under the Apache License, Version 2.0. See the LICENSE file.
+
+AllIn depends on third-party packages, listed in package.json and
+package-lock.json. Each is distributed under its own licence.

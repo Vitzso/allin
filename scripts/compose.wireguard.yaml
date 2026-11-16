@@ -1,0 +1,7 @@
+# For a box where WireGuard runs in a container. Used together with compose.yaml, after it:
+# copy compose.env.example to .env and name your WireGuard container there. See INSTALL_DOCKER.md.
+# It changes one thing. AllIn shares that container's network, so the tunnel address exists
+# inside AllIn's container. Every other setting still comes from compose.yaml.
+services:
+  allin:
+    network_mode: 'container:${ALLIN_WIREGUARD_CONTAINER:?Set ALLIN_WIREGUARD_CONTAINER in .env to the name of your WireGuard container}'

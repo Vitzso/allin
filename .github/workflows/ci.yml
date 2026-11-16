@@ -1,0 +1,94 @@
+# Runs the project's checks on GitHub's machines. It needs no secrets and can only read the repo.
+# Actions are pinned to a commit ID, with the version it was on 2026-11-16 as a comment. The Linux
+# version is pinned too, because the sandbox setting below is documented for Ubuntu 24.04.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      # The feed worker's Linux sandbox is bubblewrap, which needs unprivileged user namespaces.
+      # Ubuntu restricts them by default, so this lifts the restriction on this temporary machine.
+      - name: Allow the feed sandbox on this runner
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bubblewrap
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:build
+      - run: npx prettier --check .
+      - run: npm audit --omit=dev
+
+  browser:
+    name: Browser tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Install the test browser
+        run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run package:linux
+      - name: Build the image from the release folder
+        run: docker build -t allin-local release/allin-linux-*/
+      # No address is set, so AllIn listens on 127.0.0.1 only, without TLS. The two volumes the
+      # image declares are created new, which is what the key folder check at start relies on.
+      - name: Start the container and wait for it to answer
+        run: |
+          docker run -d --name allin --network host --read-only --cap-drop ALL --security-opt no-new-privileges:true --tmpfs /tmp allin-local
+          for attempt in $(seq 1 30); do
+            if curl -fsS -o status.json http://127.0.0.1:4310/api/status; then
+              cat status.json
+              if grep -q '"keyStore":"Linux key file"' status.json; then exit 0; fi
+              break
+            fi
+            sleep 1
+          done
+          docker logs allin
+          exit 1

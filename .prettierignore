@@ -1,0 +1,11 @@
+node_modules
+dist
+test-results
+package-lock.json
+PROJECT_SPEC.md
+tests/fixtures/
+docs/superpowers/plans/
+.superpowers
+/build
+/release
+.allin-test
