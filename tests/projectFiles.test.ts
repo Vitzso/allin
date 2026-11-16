@@ -92,7 +92,15 @@ test('the README platform table says what has and has not run', () => {
 });
 
 test('every image and page the README points to exists', () => {
-  const targets = [...readme().matchAll(/\]\((?!https?:|#)([^)#]+)[^)]*\)/g)].map((m) => m[1]!);
+  const text = readme();
+  // Markdown links and images, and the pictures placed with HTML so they can be sized.
+  const targets = [
+    ...[...text.matchAll(/\]\((?!https?:|#)([^)#]+)[^)]*\)/g)].map((m) => m[1]!),
+    ...[...text.matchAll(/\b(?:src|srcset)="(?!https?:)([^"]+)"/g)].map((m) => m[1]!),
+  ];
+  // Every picture says what it shows, for people who can't see it.
+  for (const tag of text.match(/<img\b[^>]*>/g) ?? []) assert.match(tag, /\balt="[^"]{10,}"/, tag);
+  assert.ok(targets.includes('docs/images/banner-dark.png'));
   assert.ok(targets.some((target) => target.endsWith('.png')));
   for (const target of targets) assert.ok(existsSync(join(repo, target)), target);
 });

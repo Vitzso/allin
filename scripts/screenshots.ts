@@ -4,7 +4,7 @@
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from '@playwright/test';
 
 const repo = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -36,6 +36,17 @@ try {
     await page.waitForTimeout(600);
     await page.screenshot({ path: join(images, `${view.toLowerCase()}.png`) });
     console.log(`docs/images/${view.toLowerCase()}.png`);
+  }
+  // The banner at the top of the README, in the two colour schemes GitHub can show.
+  const banner = await browser.newPage({
+    viewport: { width: 1280, height: 440 },
+    deviceScaleFactor: 2,
+  });
+  for (const theme of ['light', 'dark']) {
+    await banner.goto(`${pathToFileURL(join(repo, 'scripts', 'banner.html')).href}?${theme}`);
+    await banner.waitForLoadState('networkidle');
+    await banner.screenshot({ path: join(images, `banner-${theme}.png`) });
+    console.log(`docs/images/banner-${theme}.png`);
   }
   await browser.close();
 } finally {
