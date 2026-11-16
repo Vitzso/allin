@@ -373,7 +373,13 @@ test('npm start refuses to launch without a build', async () => {
     ],
     {
       cwd: empty,
-      env: { ...process.env, ALLIN_DATA_DIR: join(empty, 'data'), ALLIN_PORT: '47399' },
+      // Linux requires both folders to be named, and refuses before it looks for the build.
+      env: {
+        ...process.env,
+        ALLIN_DATA_DIR: join(empty, 'data'),
+        ALLIN_KEYSTORE_DIR: join(empty, 'keys'),
+        ALLIN_PORT: '47399',
+      },
     },
   );
   let stderr = '';
